@@ -10,7 +10,7 @@ abstract class AggregateRoot
     public static function fromStream(array $streamEvents): static
     {
         $instance = new static();
-        $instance->replay($streamEvents);
+        $instance->replay(self::deserializeEventStream($streamEvents));
 
         return $instance;
     }
@@ -40,4 +40,20 @@ abstract class AggregateRoot
 
     abstract protected function apply(AggregateChanged $event): void;
 
+    /**
+     * @return AggregateChanged[]
+     */
+    private static function deserializeEventStream(array $serializedEvents): array
+    {
+        $events = [];
+        foreach ($serializedEvents as $serializedEvent) {
+            $eventName = $serializedEvent['_name'];
+            $deserializer = static::eventDeserializer($eventName);
+            $events[] = $deserializer($serializedEvent);
+        }
+
+        return $events;
+    }
+
+    abstract static protected function eventDeserializer($eventName): callable;
 }

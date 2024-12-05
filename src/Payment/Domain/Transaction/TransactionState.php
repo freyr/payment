@@ -8,4 +8,6 @@ enum TransactionState: string
 {
     case FINALIZED = 'FINALIZED';
     case CREATED = 'CREATED';
+    case STARTED = 'STARTED';
+    case CANCELLED = 'CANCELLED';
 }

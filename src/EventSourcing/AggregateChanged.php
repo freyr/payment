@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Freyr\EventSourcing;
@@ -12,17 +13,11 @@ abstract class AggregateChanged implements JsonSerializable
 {
     public static function occur(Id $aggregateId, array $payload = []): static
     {
-        $payload['_aggregate_id'] = (string) $aggregateId;
-        $payload['_id'] = (string) $aggregateId;
-        $payload['_name'] = get_called_class();
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $occurredOn = new DateTimeImmutable('now', new DateTimeZone('UTC'));
-        $payload['_occurred_on'] = $occurredOn;
-
         return new static(
             Id::new(),
             $aggregateId,
-            $occurredOn,
+            static::eventName(),
+            new DateTimeImmutable('now', new DateTimeZone('UTC')),
             $payload
         );
     }
@@ -30,20 +25,46 @@ abstract class AggregateChanged implements JsonSerializable
     public function __construct(
         readonly public Id $eventId,
         readonly public Id $aggregateId,
+        readonly public string $name,
         readonly public DateTimeImmutable $occurredOn,
         readonly public array $payload
-    )
-    {
+    ) {
     }
 
     public static function fromArray(array $payload): static
     {
-        $eventId = Id::fromString($payload['_id']);
-        $aggregateId = Id::fromString($payload['_aggregate_id']);
-        $occurredOn = new DateTimeImmutable($payload['_occurred_on'], new DateTimeZone('UTC'));
-        $payload = static::preparePayload($payload);
-        return new static($eventId, $aggregateId, $occurredOn, $payload);
+        return new static(
+            Id::fromString($payload['_id']),
+            static::deserializeAggregateId($payload['_aggregate_id']),
+            static::eventName(),
+            new DateTimeImmutable(
+                $payload['_occurred_on']['date'],
+                new DateTimeZone($payload['_occurred_on']['timezone'])
+            ),
+            static::deserializePayload(
+                array_diff_assoc(
+                    $payload,
+                    ['_id', '_aggregate_id', '_occurred_on']
+                )
+            ),
+        );
     }
 
-    abstract protected static function preparePayload(array $payload): array;
+    public function jsonSerialize(): array
+    {
+        return array_merge(
+            [
+                '_id' => (string)$this->eventId,
+                '_aggregate_id' => (string)$this->aggregateId,
+                '_occurred_on' => $this->occurredOn,
+                '_name' => $this->name,
+            ],
+            $this->serializePayload($this->payload)
+        );
+    }
+
+    abstract protected static function deserializeAggregateId(string $id): Id;
+    abstract protected static function deserializePayload(array $payload): array;
+    abstract protected function serializePayload(array $payload): array;
+    abstract static public function eventName(): string;
 }

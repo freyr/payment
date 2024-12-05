@@ -10,7 +10,7 @@ use Freyr\Payment\Domain\Transaction\TransactionId;
 use Freyr\Payment\Domain\Transaction\TransactionResult;
 use Freyr\Payment\Domain\Transaction\TransactionState;
 
-class NewTransactionCreated extends AggregateChanged
+class TransactionCancelled extends AggregateChanged
 {
     public TransactionState $state {
         get => $this->payload['state'];
@@ -46,6 +46,6 @@ class NewTransactionCreated extends AggregateChanged
 
     public static function eventName(): string
     {
-        return 'new-transaction-created';
+        return 'transaction-cancelled';
     }
 }

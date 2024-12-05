@@ -6,6 +6,7 @@ namespace Freyr\Payment\Domain\Transaction;
 
 enum TransactionResult: string
 {
-    case FAILED = 'FAILED';
     case PENDING = 'PENDING';
+    case SUCCESS = 'SUCCESS';
+    case FAILED = 'FAILED';
 }

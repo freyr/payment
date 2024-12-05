@@ -6,12 +6,15 @@ namespace Freyr\Payment\Domain\Transaction;
 
 use Freyr\EventSourcing\AggregateChanged;
 use Freyr\EventSourcing\AggregateRoot;
+use Freyr\Identity\Id;
 use Freyr\Payment\Domain\Transaction\Events\NewTransactionCreated;
+use Freyr\Payment\Domain\Transaction\Events\TransactionCancelled;
 
 class Transaction extends AggregateRoot
 {
     private TransactionState $state;
     private TransactionResult $result;
+    private Id $id;
 
     public static function create(TransactionId $id): self
     {
@@ -19,7 +22,7 @@ class Transaction extends AggregateRoot
         $transaction->recordThat(
             NewTransactionCreated::occur($id, [
                 'state' => TransactionState::CREATED,
-                'status' => TransactionResult::PENDING,
+                'result' => TransactionResult::PENDING,
             ])
         );
 
@@ -28,47 +31,71 @@ class Transaction extends AggregateRoot
 
     public function start(): void
     {
-
+        $this->recordThat(
+            NewTransactionCreated::occur($this->id, [
+                'state' => TransactionState::STARTED,
+                'result' => TransactionResult::PENDING,
+            ])
+        );
     }
 
     public function cancel(): void
     {
-
+        $this->recordThat(
+            NewTransactionCreated::occur($this->id, [
+                'state' => TransactionState::CANCELLED,
+                'result' => TransactionResult::FAILED,
+            ])
+        );
     }
 
     public function retry(): void
     {
-
     }
 
     public function resolve(TransactionResolution $resolution): void
     {
         if ($resolution->succeeded()) {
-
         } else {
             if ($this->canBeRetried()) {
                 $this->retry();
             } else {
-                $this->state = TransactionState::FINALIZED;
-                $this->result = TransactionResult::FAILED;
+
             }
         }
     }
 
     private function canBeRetried(): bool
     {
-
     }
 
     protected function apply(AggregateChanged $event): void
     {
         match (get_class($event)) {
-            NewTransactionCreated::class => $this->onNewTransaction($event)
+            NewTransactionCreated::class => $this->onNewTransaction($event),
+            TransactionCancelled::class => $this->onTransactionCancelled($event),
         };
     }
 
-    private function onNewTransaction(NewTransactionCreated $event)
+    private function onNewTransaction(NewTransactionCreated $event): void
     {
+        $this->id = $event->aggregateId;
         $this->state = $event->state;
+        $this->result = $event->result;
+    }
+
+    private function onTransactionCancelled(TransactionCancelled $event): void
+    {
+        $this->id = $event->aggregateId;
+        $this->state = $event->state;
+        $this->result = $event->result;
+    }
+
+    protected static function eventDeserializer($eventName): callable
+    {
+        return match ($eventName) {
+            NewTransactionCreated::eventName() => NewTransactionCreated::fromArray(...),
+            TransactionCancelled::eventName() => TransactionCancelled::fromArray(...),
+        };
     }
 }
