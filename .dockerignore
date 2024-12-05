@@ -1,0 +1,13 @@
+*
+!.docker
+!src
+!bin
+!tests
+
+!composer.json
+!composer.lock
+!Dockerfile
+!ecs.php
+!phpstan.neon
+!phpstan-baseline.neon
+!phpunit.xml

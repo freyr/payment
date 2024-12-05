@@ -1,0 +1,34 @@
+{
+  "name": "freyr/payment",
+  "version": "1.0.0",
+  "description": "Workshop session on P&A",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "michal giergielewicz",
+      "email": "michal@giergielewicz.pl"
+    }
+  ],
+  "require": {
+    "php": "^8.4",
+    "ramsey/uuid": "^4.7",
+    "nesbot/carbon": "^3.8",
+    "symfony/console": "^7.1"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^11.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "Freyr\\Payment\\": "src/Payment",
+      "Freyr\\EventSourcing\\": "src/EventSourcing",
+      "Freyr\\Identity\\": "src/Identity"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Freyr\\Payment\\Tests\\": "tests/"
+    }
+  }
+}
