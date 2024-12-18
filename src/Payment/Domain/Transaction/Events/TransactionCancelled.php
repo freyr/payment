@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Freyr\Payment\Domain\Transaction\Events;
 
 use Freyr\EventSourcing\AggregateChanged;
-use Freyr\Identity\Id;
-use Freyr\Payment\Domain\Transaction\TransactionId;
 use Freyr\Payment\Domain\Transaction\TransactionResult;
 use Freyr\Payment\Domain\Transaction\TransactionState;
 
@@ -28,24 +26,16 @@ class TransactionCancelled extends AggregateChanged
         ];
     }
 
-    /**
-     * @param array{state: TransactionState, result: TransactionResult} $payload
-     */
-    protected function serializePayload(array $payload): array
+    protected function serializePayload(): array
     {
         return [
-            'state' => $payload['state']->value,
-            'result' => $payload['result']->value,
+            'state' => $this->payload['state']->value,
+            'result' => $this->payload['result']->value,
         ];
-    }
-
-    protected static function deserializeAggregateId(string $id): Id
-    {
-        return TransactionId::fromString($id);
     }
 
     public static function eventName(): string
     {
-        return 'transaction-cancelled';
+        return 'payment.transaction.cancelled';
     }
 }

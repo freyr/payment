@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Freyr\Payment\Domain\Transaction;
 
-use Freyr\Identity\Id;
+use Freyr\EventSourcing\AggregateId;
 
-class TransactionId extends Id
+readonly class TransactionId extends AggregateId
 {
 
 }
