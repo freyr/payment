@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Freyr\EventSourcing;
 
 use DateTimeImmutable;
-use Freyr\Exchange\DomainModel\StockId;
 use Freyr\Identity\Id;
 
 abstract class AggregateRoot

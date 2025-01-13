@@ -24,7 +24,8 @@
       "Freyr\\Payment\\": "src/Payment",
       "Freyr\\Exchange\\": "src/Exchange",
       "Freyr\\EventSourcing\\": "src/EventSourcing",
-      "Freyr\\Identity\\": "src/Identity"
+      "Freyr\\Identity\\": "src/Identity",
+      "Freyr\\QA\\": "src/QA"
     }
   },
   "autoload-dev": {
