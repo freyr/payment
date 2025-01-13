@@ -13,7 +13,7 @@
   "require": {
     "php": "^8.4",
     "ramsey/uuid": "^4.7",
-    "nesbot/carbon": "^3.8",
+    "nesbot/carbon": "^3.8.4",
     "symfony/console": "^7.1",
     "ext-redis": "*"
   },
@@ -24,6 +24,8 @@
     "psr-4": {
       "Freyr\\Payment\\": "src/Payment",
       "Freyr\\Exchange\\": "src/Exchange",
+      "Freyr\\Prescription\\": "src/Prescription",
+      "Freyr\\Pharmacy\\": "src/Pharmacy",
       "Freyr\\EventSourcing\\": "src/EventSourcing",
       "Freyr\\Identity\\": "src/Identity",
       "Freyr\\QA\\": "src/QA"

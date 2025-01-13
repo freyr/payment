@@ -8,6 +8,7 @@ RUN apk --no-cache add  \
         opcache \
         zip \
         pcntl \
+        redis \
         xdebug-3.4.0 \
     && docker-php-source delete \
     && rm -rf /tmp/* \
