@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Freyr\Payment\Domain\Transaction;
 
 use Freyr\EventSourcing\AggregateChanged;
-use Freyr\EventSourcing\AggregateId;
 use Freyr\EventSourcing\AggregateRoot;
 use Freyr\Payment\Domain\Transaction\Events\NewTransactionCreated;
 use Freyr\Payment\Domain\Transaction\Events\TransactionCancelled;
@@ -15,16 +14,11 @@ class Transaction extends AggregateRoot
     private TransactionState $state;
     private TransactionResult $result;
 
-    public function __construct(
-        public readonly AggregateId|TransactionId $aggregateId)
-    {
-
-    }
     public static function create(TransactionId $id): self
     {
         $transaction = new self($id);
         $transaction->recordThat(
-            NewTransactionCreated::occur($transaction->aggregateId, [
+            NewTransactionCreated::occur([
                 'state' => TransactionState::CREATED,
                 'result' => TransactionResult::PENDING,
             ])
@@ -36,7 +30,7 @@ class Transaction extends AggregateRoot
     public function start(): void
     {
         $this->recordThat(
-            NewTransactionCreated::occur($this->aggregateId, [
+            NewTransactionCreated::occur([
                 'state' => TransactionState::STARTED,
                 'result' => TransactionResult::PENDING,
             ])
@@ -46,27 +40,16 @@ class Transaction extends AggregateRoot
     public function cancel(): void
     {
         $this->recordThat(
-            NewTransactionCreated::occur($this->aggregateId, [
+            NewTransactionCreated::occur([
                 'state' => TransactionState::CANCELLED,
                 'result' => TransactionResult::FAILED,
             ])
         );
     }
 
-    public function retry(): void
-    {
-    }
-
     public function resolve(TransactionResolution $resolution): void
     {
-        if ($resolution->succeeded()) {
-        } else {
-            if ($this->canBeRetried()) {
-                $this->retry();
-            } else {
 
-            }
-        }
     }
 
     private function canBeRetried(): bool
@@ -94,7 +77,7 @@ class Transaction extends AggregateRoot
         $this->result = $event->result;
     }
 
-    protected static function eventDeserializer(string $eventName): callable
+    protected static function eventDeserializer($eventName): callable
     {
         return match ($eventName) {
             NewTransactionCreated::eventName() => NewTransactionCreated::fromArray(...),

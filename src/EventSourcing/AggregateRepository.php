@@ -4,47 +4,27 @@ declare(strict_types=1);
 
 namespace Freyr\EventSourcing;
 
-use DateTimeImmutable;
 use Freyr\Identity\Id;
 
-abstract class AggregateRepository
+abstract readonly class AggregateRepository
 {
-
-    public function load(AggregateId $aggregateId): AggregateRoot
+    public function __construct(private AggregateStorage $storage)
     {
-        $results = $this->loadEvents($aggregateId);
-        $aggregateCallable = $this->aggregateCallable();
-        return $aggregateCallable($aggregateId, $results);
     }
 
-    public function persist(AggregateRoot $aggregate): void
+    public function persist(AggregateRoot $root): void
     {
-        $events = EventExtractor::extract($aggregate);
-
-        foreach ($events as $event) {
-            $this->storeEvents(
-                $event->eventId,
-                $aggregate->aggregateId,
-                $event->occurredOn,
-                $event::eventName(),
-                $event->payload,
-            );
-        }
+        $eventExtractor = fn() => $this->popRecordedEvents();
+        /** @var AggregateChanged[] $events */
+        $events = $eventExtractor->call($root);
+        $this->storage->store($root->id, $events);
     }
 
-    abstract protected function storeEvents(
-        Id $eventId,
-        AggregateId $aggregateId,
-        DateTimeImmutable $occurredOn,
-        string $eventName,
-        array $payload
-    ): void;
+    public function getById(Id $id): AggregateRoot
+    {
+        $events = $this->storage->load($id);
+        return $this->replayEvents($id, $events);
+    }
 
-    abstract protected function loadEvents(AggregateId $aggregateId): array;
-
-    /**
-     * @return callable (AggregateRoot::fromStream())
-     */
-    abstract protected function aggregateCallable(): callable;
-
+    abstract protected function replayEvents(Id $id, array $events): AggregateRoot;
 }

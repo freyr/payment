@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Freyr\Payment\Domain\Transaction\Events;
 
 use Freyr\EventSourcing\AggregateChanged;
+use Freyr\Identity\Id;
+use Freyr\Payment\Domain\Transaction\TransactionId;
 use Freyr\Payment\Domain\Transaction\TransactionResult;
 use Freyr\Payment\Domain\Transaction\TransactionState;
 
@@ -26,16 +28,19 @@ class NewTransactionCreated extends AggregateChanged
         ];
     }
 
-    protected function serializePayload(): array
+    /**
+     * @param array{state: TransactionState, result: TransactionResult} $payload
+     */
+    protected function serializePayload(array $payload): array
     {
         return [
-            'state' => $this->payload['state']->value,
-            'result' => $this->payload['result']->value,
+            'state' => $payload['state']->value,
+            'result' => $payload['result']->value,
         ];
     }
 
     public static function eventName(): string
     {
-        return 'payment.transaction.new';
+        return 'new-transaction-created';
     }
 }

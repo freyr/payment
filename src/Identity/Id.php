@@ -7,7 +7,7 @@ namespace Freyr\Identity;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
-readonly class Id
+class Id
 {
 
     public function __construct(protected UuidInterface $id)
@@ -37,11 +37,6 @@ readonly class Id
 
     public function toBinary(): string
     {
-        return $this->id->getBytes();
-    }
-
-    public function equals(Id $id): bool
-    {
-        return $this->id->equals($id->id);
+        return $this->id->toString();
     }
 }
