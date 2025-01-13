@@ -26,8 +26,9 @@
       "Freyr\\Exchange\\": "src/Exchange",
       "Freyr\\Prescription\\": "src/Prescription",
       "Freyr\\Pharmacy\\": "src/Pharmacy",
-      "Freyr\\EventSourcing\\": "src/EventSourcing",
-      "Freyr\\Identity\\": "src/Identity",
+      "Freyr\\EventSourcing\\": "local-vendor/EventSourcing",
+      "Freyr\\Bus\\": "local-vendor/Bus",
+      "Freyr\\Identity\\": "local-vendor/Identity",
       "Freyr\\QA\\": "src/QA"
     }
   },

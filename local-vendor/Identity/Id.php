@@ -10,7 +10,7 @@ use Ramsey\Uuid\UuidInterface;
 class Id
 {
 
-    public function __construct(protected UuidInterface $id)
+    public function __construct(readonly protected UuidInterface $id)
     {
     }
 
