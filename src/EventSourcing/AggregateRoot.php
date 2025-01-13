@@ -4,36 +4,38 @@ declare(strict_types=1);
 
 namespace Freyr\EventSourcing;
 
-use DateTimeImmutable;
 use Freyr\Identity\Id;
 
 abstract class AggregateRoot
 {
-    /**
-     * @var AggregateChanged[]
-     */
     private array $events = [];
-    public function __construct(
-        readonly public AggregateId $aggregateId,
-    ) {}
 
-    public static function fromStream(AggregateId $aggregateId, array $streamEvents): static
+    protected function __construct(protected(set) Id $id)
     {
-        $instance = new static($aggregateId);
-        $instance->replay(
-            self::deserializeEventStream(
-                $aggregateId,
-                $streamEvents,
-            )
-        );
+    }
+
+    public static function fromStream(Id $id, array $streamEvents): static
+    {
+        $instance = new static($id);
+        $instance->replay(self::deserializeEventStream($streamEvents));
+
         return $instance;
     }
 
-    /** @var AggregateChanged[] $eventStream */
-    protected function replay(array $eventStream): void
+    protected function popRecordedEvents(): array
     {
-        foreach ($eventStream as $event) {
-            $this->apply($event);
+        $pendingEvents = $this->events;
+
+        $this->events = [];
+
+        return $pendingEvents;
+    }
+
+    protected function replay(array $historyEvents): void
+    {
+        /** @var AggregateChanged $pastEvent */
+        foreach ($historyEvents as $pastEvent) {
+            $this->apply($pastEvent);
         }
     }
 
@@ -43,33 +45,22 @@ abstract class AggregateRoot
         $this->apply($event);
     }
 
-    /** @return AggregateChanged[] */
-    private static function deserializeEventStream(AggregateId $aggregateId, array $serializedEvents): array
+    /**
+     * @return AggregateChanged[]
+     */
+    private static function deserializeEventStream(array $serializedEvents): array
     {
         $events = [];
         foreach ($serializedEvents as $serializedEvent) {
-            $eventId = Id::fromString($serializedEvent['eventId']);
-            $occurredOn = DateTimeImmutable::createFromTimestamp($serializedEvent['occurredOn']);
-
-            $deserializer = static::eventDeserializer($serializedEvent['name']);
-            $events[] = $deserializer(
-                $eventId,
-                $aggregateId,
-                $occurredOn,
-                $serializedEvent['payload']
-            );
+            $eventName = $serializedEvent['_name'];
+            $deserializer = static::eventDeserializer($eventName);
+            $events[] = $deserializer($serializedEvent);
         }
 
         return $events;
     }
 
-    protected function popEvents(): array
-    {
-        $pendingEvents = $this->events;
-        $this->events = [];
-        return $pendingEvents;
-    }
-
     abstract protected function apply(AggregateChanged $event): void;
-    abstract static protected function eventDeserializer(string $eventName): callable;
+
+    abstract static protected function eventDeserializer($eventName): callable;
 }
