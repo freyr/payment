@@ -1,15 +1,17 @@
 <?php
+
 declare(strict_types=1);
 
-namespace Freyr\Exchange\DomainModel\Orders\Events;
+namespace Freyr\Exchange\DomainModel\Event;
 
 use Freyr\EventSourcing\AggregateChanged;
+use Freyr\Exchange\DomainModel\TradingOrder\Order;
 
-class IPOExecuted extends AggregateChanged
+class InactiveOrderWasRegistered extends AggregateChanged
 {
-    public static function eventName(): string
-    {
-        return 'exchange.ipo.executed';
+
+    public Order $inactiveOrder {
+        get => $this->payload['inactiveOrder'];
     }
 
     protected static function deserializePayload(array $payload): array
@@ -20,5 +22,10 @@ class IPOExecuted extends AggregateChanged
     protected function serializePayload(array $payload): array
     {
         // TODO: Implement serializePayload() method.
+    }
+
+    static public function eventName(): string
+    {
+        // TODO: Implement eventName() method.
     }
 }

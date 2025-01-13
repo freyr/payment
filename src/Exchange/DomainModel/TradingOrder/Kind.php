@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Freyr\Exchange\DomainModel\Orders;
+namespace Freyr\Exchange\DomainModel\TradingOrder;
 
 enum Kind: string
 {

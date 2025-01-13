@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Freyr\Exchange\DomainModel;
+namespace Freyr\Exchange\DomainModel\TradingSession;
 
 use Freyr\Identity\Id;
 

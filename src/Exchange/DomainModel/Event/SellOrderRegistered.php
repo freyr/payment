@@ -1,12 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace Freyr\Exchange\DomainModel\Orders\Events;
+namespace Freyr\Exchange\DomainModel\Event;
 
 use Freyr\EventSourcing\AggregateChanged;
 
-class BuyOrderRegistered extends AggregateChanged
+class SellOrderRegistered extends AggregateChanged
 {
+    public static function eventName(): string
+    {
+        return 'exchange.order.sell.registered';
+    }
 
     protected static function deserializePayload(array $payload): array
     {
@@ -16,10 +20,5 @@ class BuyOrderRegistered extends AggregateChanged
     protected function serializePayload(array $payload): array
     {
         // TODO: Implement serializePayload() method.
-    }
-
-    static public function eventName(): string
-    {
-        return 'exchange.order.buy.registered';
     }
 }

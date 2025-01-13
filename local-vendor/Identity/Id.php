@@ -39,4 +39,9 @@ class Id
     {
         return $this->id->toString();
     }
+
+    public function sameAs(Id $id): bool
+    {
+        return $this->id->equals($id->id);
+    }
 }

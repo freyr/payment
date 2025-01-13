@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Freyr\Exchange\DomainModel;
+namespace Freyr\Exchange\DomainModel\TradingSession;
 
 use Carbon\Carbon;
+use DateTimeImmutable;
 
 readonly class TradingDay
 {
@@ -12,7 +13,6 @@ readonly class TradingDay
         private Carbon $date
     )
     {
-
     }
 
     public static function create(): self
@@ -30,7 +30,7 @@ readonly class TradingDay
         return $this->date->format('Y.m.d');
     }
 
-    public function sameAs(TradingDay $day): bool
+    public function sameAs(DateTimeImmutable $day): bool
     {
         return $this->date->isSameDay($day);
     }
