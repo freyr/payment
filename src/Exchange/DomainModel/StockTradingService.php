@@ -7,4 +7,8 @@ namespace Freyr\Exchange\DomainModel;
 class StockTradingService
 {
 
+    public function placeOrder(Command\PlaceOrder $command): PlaceOrderResult
+    {
+
+    }
 }
